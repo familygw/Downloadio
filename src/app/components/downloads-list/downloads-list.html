@@ -1,0 +1,43 @@
+<section class="list-panel" aria-label="Downloads">
+  <header class="list-header">
+    <span>Name</span>
+    <span>Progress</span>
+    <span>Speed</span>
+    <span>Status</span>
+    <span>ETA</span>
+  </header>
+
+  <div class="download-list">
+    @for (download of downloads(); track download.id) {
+    <button
+            type="button"
+            class="download-row"
+            [class.is-selected]="selectedDownloadId() === download.id"
+            (click)="downloadSelected.emit(download.id)">
+      <div class="download-row__name">
+        <strong>{{ download.fileName }}</strong>
+        <span>{{ download.host }} · {{ download.destinationLabel }}</span>
+      </div>
+
+      <div class="download-row__progress">
+        <div class="progress-track" aria-hidden="true">
+          <span [style.width.%]="download.progress"></span>
+        </div>
+        <small>{{ download.transferredLabel }} / {{ download.sizeLabel }}</small>
+      </div>
+
+      <div class="download-row__speed">{{ download.speedLabel }}</div>
+
+      <div class="download-row__status">
+        <span
+              class="status-badge"
+              [attr.data-status]="statusMeta()[download.status].tone">
+          {{ statusMeta()[download.status].label }}
+        </span>
+      </div>
+
+      <div class="download-row__eta">{{ download.etaLabel }}</div>
+    </button>
+    }
+  </div>
+</section>

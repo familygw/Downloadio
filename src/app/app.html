@@ -1,0 +1,111 @@
+<header class="toolbar">
+  <div class="brand-cluster">
+    <div class="brand-mark" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="brand-copy">
+      <p class="brand-kicker">Desktop download manager</p>
+      <h1>Downloadio</h1>
+    </div>
+  </div>
+
+  <nav class="filter-strip" aria-label="Download filters">
+    @for (filter of filters; track filter.key) {
+    <button
+            type="button"
+            class="filter-pill"
+            [class.is-active]="activeFilter() === filter.key"
+            [attr.aria-pressed]="activeFilter() === filter.key"
+            (click)="setFilter(filter.key)">
+      <span>{{ filter.label }}</span>
+      <strong>{{ counts()[filter.key] }}</strong>
+    </button>
+    }
+  </nav>
+
+  <div class="toolbar-actions">
+    <button type="button"
+            class="toolbar-button toolbar-button--primary"
+            data-testid="new-download-toggle"
+            (click)="toggleComposer()">
+      {{ isComposerOpen() ? 'Close' : 'New download' }}
+    </button>
+    <button type="button" class="toolbar-button">Pause all</button>
+    <button type="button" class="toolbar-button">Preferences</button>
+  </div>
+</header>
+
+@if (isComposerOpen()) {
+<section class="composer-panel" aria-labelledby="new-download-title">
+  <form class="composer-form"
+        data-testid="new-download-form"
+        [formGroup]="newDownloadForm"
+        (ngSubmit)="startDownloadFromComposer()">
+    <div class="composer-copy">
+      <p class="section-label">New download</p>
+      <h2 id="new-download-title">Paste a direct URL and start the entry.</h2>
+    </div>
+
+    <label class="composer-field" for="source-url">
+      <span class="composer-label">URL</span>
+      <input #sourceUrlInput
+             id="source-url"
+             type="url"
+             class="composer-input"
+             [class.is-invalid]="sourceUrlControl.invalid && sourceUrlControl.touched"
+             formControlName="sourceUrl"
+             placeholder="https://example.com/file.zip"
+             autocomplete="off"
+             autofocus
+             spellcheck="false">
+      @if (sourceUrlControl.invalid && sourceUrlControl.touched) {
+      <small class="composer-error">
+        Enter a valid HTTP or HTTPS URL.
+      </small>
+      }
+    </label>
+
+    <div class="composer-actions">
+      <button type="submit" class="toolbar-button toolbar-button--primary">
+        Start
+      </button>
+      <button type="button" class="toolbar-button" (click)="closeComposer()">
+        Cancel
+      </button>
+    </div>
+  </form>
+</section>
+}
+
+<app-queue-overview [completionRate]="completionRate()"
+                    [globalSpeedLabel]="globalSpeedLabel()"
+                    [activeCount]="counts().active"
+                    [failedCount]="counts().failed"
+                    [platformLabel]="platformLabel()" />
+
+<main class="workspace">
+  <app-downloads-list [downloads]="visibleDownloads()"
+                      [selectedDownloadId]="selectedDownloadId()"
+                      [statusMeta]="statusMeta"
+                      (downloadSelected)="selectDownload($event)" />
+
+  <app-download-inspector [selectedDownload]="selectedDownload()"
+                          [statusMeta]="statusMeta"
+                          [canResume]="canResumeSelected()"
+                          [canPause]="canPauseSelected()"
+                          [canRetry]="canRetrySelected()"
+                          [canReveal]="canRevealSelected()"
+                          [canCancel]="canCancelSelected()"
+                          [resumeActionLabel]="resumeActionLabel()"
+                          (resumeRequested)="resumeSelectedDownload()"
+                          (pauseRequested)="pauseSelectedDownload()"
+                          (retryRequested)="retrySelectedDownload()"
+                          (revealRequested)="revealSelectedDownload()"
+                          (cancelRequested)="cancelSelectedDownload()"
+                          (removeRequested)="removeSelectedDownload()" />
+</main>
+
+<app-status-bar [totalCount]="counts().all" />

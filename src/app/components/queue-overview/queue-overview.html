@@ -1,0 +1,39 @@
+<section class="overview">
+  <article class="overview-card overview-card--hero">
+    <p class="section-label">Queue pulse</p>
+    <div class="hero-copy">
+      <div class="hero-copy__content">
+        <h2>Operational queue overview.</h2>
+        <p>
+          Monitor completion, throughput, and desktop runtime readiness from a
+          single control surface.
+        </p>
+      </div>
+
+      <div class="orbital-meter" aria-hidden="true">
+        <div class="orbital-meter__ring"></div>
+        <div class="orbital-meter__core">
+          <span>{{ completionRate() }}%</span>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="overview-card">
+    <p class="section-label">Throughput</p>
+    <strong>{{ globalSpeedLabel() }}</strong>
+    <span>live aggregate speed</span>
+  </article>
+
+  <article class="overview-card">
+    <p class="section-label">Queue health</p>
+    <strong>{{ activeCount() }} active</strong>
+    <span>{{ failedCount() }} needing review</span>
+  </article>
+
+  <article class="overview-card">
+    <p class="section-label">Runtime</p>
+    <strong>{{ platformLabel() }}</strong>
+    <span>desktop bridge online</span>
+  </article>
+</section>

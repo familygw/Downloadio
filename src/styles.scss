@@ -1,0 +1,41 @@
+@import "@fortawesome/fontawesome-free/css/all.min.css";
+
+:root {
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --page-surface:
+    radial-gradient(circle at top left, rgba(164, 190, 201, 0.26), transparent 26%), radial-gradient(circle at bottom right, rgba(205, 217, 221, 0.42), transparent 32%),
+    linear-gradient(180deg, #f2f5f6 0%, #e8edef 100%);
+  --panel-surface: linear-gradient(180deg, #f8fbfb 0%, #eef3f4 100%);
+  --ink-strong: #22333f;
+  --ink-soft: #556774;
+  --ink-muted: #83929c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink-strong);
+  background: #edf2f3;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}

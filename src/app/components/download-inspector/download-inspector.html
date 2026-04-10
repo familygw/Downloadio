@@ -1,0 +1,127 @@
+<aside class="inspector-panel" aria-label="Selected download details">
+  @if (selectedDownload(); as selected) {
+  <header class="inspector-header">
+    <div class="inspector-topline">
+      <p class="section-label">Inspector</p>
+      <span
+            class="status-badge"
+            [attr.data-status]="statusMeta()[selected.status].tone">
+        {{ statusMeta()[selected.status].label }}
+      </span>
+    </div>
+
+    <h3>{{ selected.fileName }}</h3>
+    <p class="inspector-summary">{{ selected.note }}</p>
+
+    <div class="inspector-progress">
+      <div class="progress-track progress-track--large" aria-hidden="true">
+        <span [style.width.%]="selected.progress"></span>
+      </div>
+      <div class="inspector-progress__meta">
+        <strong>{{ selected.progress }}%</strong>
+        <span>{{ selected.transferredLabel }} of {{ selected.sizeLabel }}</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="inspector-body">
+    <dl class="detail-grid">
+      <div>
+        <dt>Source</dt>
+        <dd>{{ selected.sourceLabel }}</dd>
+      </div>
+      <div>
+        <dt>Destination</dt>
+        <dd
+          class="detail-grid__value--ellipsis"
+          [title]="selected.destinationLabel">
+          {{ selected.destinationLabel }}
+        </dd>
+      </div>
+      <div>
+        <dt>Segments</dt>
+        <dd>{{ selected.segments }}</dd>
+      </div>
+      <div>
+        <dt>Resume support</dt>
+        <dd>{{ selected.resumeSupported ? 'Available' : 'Unavailable' }}</dd>
+      </div>
+      <div>
+        <dt>Current speed</dt>
+        <dd>{{ selected.speedLabel }}</dd>
+      </div>
+      <div>
+        <dt>Remaining</dt>
+        <dd>{{ selected.etaLabel }}</dd>
+      </div>
+    </dl>
+
+    <section class="event-log">
+      <p class="section-label">Latest event</p>
+      <p>{{ selected.lastEvent }}</p>
+    </section>
+  </div>
+
+  <footer class="inspector-footer">
+    <button
+            type="button"
+            class="inspector-action inspector-action--primary"
+            data-testid="resume-download"
+            [disabled]="!canResume()"
+            [attr.aria-label]="resumeActionLabel()"
+            [title]="resumeActionLabel()"
+            (click)="resumeRequested.emit()">
+      <i class="fa-solid fa-play" aria-hidden="true"></i>
+    </button>
+    <button
+            type="button"
+            class="inspector-action"
+            data-testid="pause-download"
+            [disabled]="!canPause()"
+            aria-label="Pause download"
+            title="Pause download"
+            (click)="pauseRequested.emit()">
+      <i class="fa-solid fa-pause" aria-hidden="true"></i>
+    </button>
+    <button
+            type="button"
+            class="inspector-action"
+            data-testid="retry-download"
+            [disabled]="!canRetry()"
+            aria-label="Retry download"
+            title="Retry download"
+            (click)="retryRequested.emit()">
+      <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+    </button>
+    <button
+            type="button"
+            class="inspector-action"
+            data-testid="reveal-download"
+            [disabled]="!canReveal()"
+            aria-label="Open download location"
+            title="Open download location"
+            (click)="revealRequested.emit()">
+      <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+    </button>
+    <button
+            type="button"
+            class="inspector-action inspector-action--danger"
+            [disabled]="!canCancel()"
+            aria-label="Cancel download"
+            title="Cancel download"
+            data-testid="cancel-download"
+            (click)="cancelRequested.emit()">
+      <i class="fa-solid fa-ban" aria-hidden="true"></i>
+    </button>
+    <button
+            type="button"
+            class="inspector-action inspector-action--danger"
+            aria-label="Delete download"
+            title="Delete download"
+            data-testid="delete-download"
+            (click)="removeRequested.emit()">
+      <i class="fa-solid fa-trash" aria-hidden="true"></i>
+    </button>
+  </footer>
+  }
+</aside>
