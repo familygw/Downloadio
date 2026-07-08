@@ -12,29 +12,31 @@
     "build:web": "ng build",
     "watch": "ng build --watch --configuration development",
     "preview:desktop": "node tools/preview.mjs",
-    "test": "ng test"
+    "test": "ng test",
+    "build:mac": "npm run build:web && electron-builder --mac --arm64"
   },
   "private": true,
   "dependencies": {
-    "@angular/common": "^22.0.0",
-    "@angular/compiler": "^22.0.0",
-    "@angular/core": "^22.0.0",
-    "@angular/forms": "^22.0.0",
-    "@angular/platform-browser": "^22.0.0",
-    "@angular/router": "^22.0.0",
-    "@fortawesome/fontawesome-free": "^7.2.0",
+    "@angular/common": "^22.0.5",
+    "@angular/compiler": "^22.0.5",
+    "@angular/core": "^22.0.5",
+    "@angular/forms": "^22.0.5",
+    "@angular/platform-browser": "^22.0.5",
+    "@angular/router": "^22.0.5",
+    "@fortawesome/fontawesome-free": "^7.3.0",
     "rxjs": "~7.8.2",
     "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@angular/build": "^22.0.0",
-    "@angular/cli": "^22.0.0",
-    "@angular/compiler-cli": "^22.0.0",
-    "electron": "^42.3.3",
+    "@angular/build": "^22.0.5",
+    "@angular/cli": "^22.0.5",
+    "@angular/compiler-cli": "^22.0.5",
+    "electron": "^43.0.0",
+    "electron-builder": "^26.15.3",
     "jsdom": "^29.1.1",
-    "prettier": "^3.8.3",
+    "prettier": "^3.9.4",
     "typescript": "~6.0.3",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.9"
   },
   "allowScripts": {
     "@parcel/watcher": true,
@@ -42,5 +44,31 @@
     "fsevents": true,
     "lmdb": true,
     "msgpackr-extract": true
+  },
+  "build": {
+    "appId": "com.familygw.downloadio",
+    "productName": "Downloadio",
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/downloadio/browser/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64"]
+        }
+      ],
+      "category": "public.app-category.utilities"
+    }
   }
 }

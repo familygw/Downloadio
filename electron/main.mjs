@@ -1,13 +1,53 @@
 import path from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, net, protocol, shell } from 'electron';
 import { createDownloadManager } from './download-manager.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const downloadManager = createDownloadManager({ app, BrowserWindow });
+
+const APP_SCHEME = 'app';
+const rendererRoot = path.join(__dirname, '..', 'dist', 'downloadio', 'browser');
+
+// Serving the built renderer over a custom, non-opaque scheme (instead of
+// file://) is required so the Angular build's `<script type="module">`
+// bundle can actually load: Chromium blocks module script fetches on the
+// opaque file:// origin, which produces a silent blank window with no
+// console errors.
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: APP_SCHEME,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      corsEnabled: true,
+      stream: true
+    }
+  }
+]);
+
+function registerAppProtocol() {
+  protocol.handle(APP_SCHEME, (request) => {
+    const requestUrl = new URL(request.url);
+    let relativePath = decodeURIComponent(requestUrl.pathname);
+
+    if (relativePath === '' || relativePath === '/') {
+      relativePath = '/index.html';
+    }
+
+    const filePath = path.normalize(path.join(rendererRoot, relativePath));
+
+    if (!filePath.startsWith(rendererRoot)) {
+      return new Response('Forbidden', { status: 403 });
+    }
+
+    return net.fetch(pathToFileURL(filePath).toString());
+  });
+}
 
 function getRendererEntry() {
   const devUrl = process.env.DOWNLOADIO_RENDERER_URL;
@@ -17,8 +57,8 @@ function getRendererEntry() {
   }
 
   return {
-    type: 'file',
-    value: path.join(__dirname, '..', 'dist', 'downloadio', 'browser', 'index.html')
+    type: 'url',
+    value: `${APP_SCHEME}://index.html`
   };
 }
 
@@ -44,11 +84,7 @@ function createMainWindow() {
 
   const entry = getRendererEntry();
 
-  if (entry.type === 'url') {
-    void mainWindow.loadURL(entry.value);
-  } else {
-    void mainWindow.loadFile(entry.value);
-  }
+  void mainWindow.loadURL(entry.value);
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     void shell.openExternal(url);
@@ -106,6 +142,7 @@ ipcMain.handle('downloads:delete', async (_event, input) => {
 });
 
 app.whenReady().then(() => {
+  registerAppProtocol();
   createMainWindow();
 
   app.on('activate', () => {
